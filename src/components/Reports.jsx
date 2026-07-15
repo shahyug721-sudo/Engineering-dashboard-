@@ -56,8 +56,8 @@ export default function Reports() {
           <button className="btn primary" onClick={copyReport}>📋 Copy Report</button>
         </div>
         <p className="muted">
-          Scheduled every day at 3:30 PM to: <b>{store.reportRecipients}</b> (configure in Settings). This preview is
-          generated live from current dashboard data.
+          Scheduled every day at 3:30 PM to: <b>{store.reportRecipients || 'not configured yet'}</b> (configure in
+          Settings). This preview is generated live from current dashboard data.
         </p>
         <div className="report-metrics">
           {metrics.map(([k, v]) => (

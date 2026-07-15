@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { SEED } from './data.js'
 import { uid, statusLabel, STAGES } from './utils.js'
 
-const KEY = 'engineering-dashboard-v1'
+const KEY = 'engineering-dashboard-v2'
 const StoreCtx = createContext(null)
 
 function load() {
@@ -34,6 +34,16 @@ export function StoreProvider({ children }) {
 
   const stamp = (s, p) => ({ ...p, lastUpdated: now(), updatedBy: s.currentUser })
 
+  // Owners/products typed into a project form are registered automatically.
+  const register = (s, data) => {
+    let { owners, products } = s
+    const owner = (data.owner || '').trim()
+    const product = (data.product || '').trim()
+    if (owner && !owners.includes(owner)) owners = [...owners, owner]
+    if (product && !products.includes(product)) products = [...products, product]
+    return { ...s, owners, products }
+  }
+
   const api = {
     ...state,
 
@@ -41,7 +51,7 @@ export function StoreProvider({ children }) {
       setState((s) => {
         const project = stamp(s, { ...data, id: uid() })
         return log(
-          { ...s, projects: [...s.projects, project] },
+          { ...register(s, data), projects: [...s.projects, project] },
           `Created project "${project.name}"`
         )
       })
@@ -53,7 +63,7 @@ export function StoreProvider({ children }) {
           p.id === id ? stamp(s, { ...p, ...patch }) : p
         )
         const name = (s.projects.find((p) => p.id === id) || {}).name || ''
-        return log({ ...s, projects }, note || `Updated project "${name}"`)
+        return log({ ...register(s, patch), projects }, note || `Updated project "${name}"`)
       })
     },
 

@@ -48,18 +48,22 @@ export default function BackendSheet({ onEdit, onAdd }) {
                   />
                 </td>
                 <td>
-                  <select value={p.owner} onChange={(e) => store.updateProject(p.id, { owner: e.target.value })}>
-                    {store.owners.map((o) => (
-                      <option key={o}>{o}</option>
-                    ))}
-                  </select>
+                  <input
+                    className="cell-input"
+                    list="bs-owners-list"
+                    value={p.owner || ''}
+                    placeholder="Owner"
+                    onChange={(e) => store.updateProject(p.id, { owner: e.target.value })}
+                  />
                 </td>
                 <td>
-                  <select value={p.product} onChange={(e) => store.updateProject(p.id, { product: e.target.value })}>
-                    {store.products.map((o) => (
-                      <option key={o}>{o}</option>
-                    ))}
-                  </select>
+                  <input
+                    className="cell-input"
+                    list="bs-products-list"
+                    value={p.product || ''}
+                    placeholder="Product"
+                    onChange={(e) => store.updateProject(p.id, { product: e.target.value })}
+                  />
                 </td>
                 {STAGES.map((s) => (
                   <td key={s.key}>
@@ -106,8 +110,25 @@ export default function BackendSheet({ onEdit, onAdd }) {
                 </td>
               </tr>
             ))}
+            {store.projects.length === 0 && (
+              <tr>
+                <td colSpan={STAGES.length + 8} className="empty">
+                  No projects yet — click “+ Add Project” to create the first one.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
+        <datalist id="bs-owners-list">
+          {store.owners.map((o) => (
+            <option key={o} value={o} />
+          ))}
+        </datalist>
+        <datalist id="bs-products-list">
+          {store.products.map((o) => (
+            <option key={o} value={o} />
+          ))}
+        </datalist>
       </div>
       <div className="table-foot">
         <span className="muted">

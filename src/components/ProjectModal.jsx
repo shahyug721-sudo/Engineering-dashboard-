@@ -77,19 +77,31 @@ export default function ProjectModal({ project, onClose }) {
             </label>
             <label>
               Owner
-              <select value={form.owner} onChange={(e) => set('owner', e.target.value)}>
+              <input
+                list="owners-list"
+                value={form.owner}
+                onChange={(e) => set('owner', e.target.value)}
+                placeholder="Type or pick an owner"
+              />
+              <datalist id="owners-list">
                 {store.owners.map((o) => (
-                  <option key={o}>{o}</option>
+                  <option key={o} value={o} />
                 ))}
-              </select>
+              </datalist>
             </label>
             <label>
               Product
-              <select value={form.product} onChange={(e) => set('product', e.target.value)}>
+              <input
+                list="products-list"
+                value={form.product}
+                onChange={(e) => set('product', e.target.value)}
+                placeholder="e.g. GA Blue, GA Red, AI, Website"
+              />
+              <datalist id="products-list">
                 {store.products.map((o) => (
-                  <option key={o}>{o}</option>
+                  <option key={o} value={o} />
                 ))}
-              </select>
+              </datalist>
             </label>
             <label>
               Tentative Release Date

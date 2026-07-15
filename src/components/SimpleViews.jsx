@@ -110,11 +110,11 @@ export function SettingsView() {
         <button
           className="btn danger"
           onClick={() =>
-            confirm('Reset all data back to the original PRD sample data? Your edits will be lost.') &&
+            confirm('Clear ALL projects, owners, products and activity? This cannot be undone.') &&
             store.resetData()
           }
         >
-          ↺ Reset to sample data
+          🗑️ Clear all data (fresh start)
         </button>
       </div>
     </div>
