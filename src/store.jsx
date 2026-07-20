@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { SEED } from './data.js'
 import { uid, statusLabel, STAGES } from './utils.js'
 
-const KEY = 'engineering-dashboard-v2'
+const KEY = 'engineering-dashboard-v3'
 const StoreCtx = createContext(null)
 
 function load() {
