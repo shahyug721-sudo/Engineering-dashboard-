@@ -33,7 +33,7 @@ function Pipeline({ p }) {
   )
 }
 
-export default function ProjectDetails({ project, onEdit }) {
+export default function ProjectDetails({ project, onEdit, onSelect }) {
   const store = useStore()
   const [newTask, setNewTask] = useState('')
   const [editingUpdate, setEditingUpdate] = useState(false)
@@ -65,7 +65,23 @@ export default function ProjectDetails({ project, onEdit }) {
   return (
     <div className="panel details">
       <div className="details-head">
-        <h2>Project Details</h2>
+        <div className="details-head-left">
+          <h2>Project Details</h2>
+          {onSelect && store.projects.length > 0 && (
+            <select
+              className="project-picker"
+              value={p.id}
+              onChange={(e) => onSelect(e.target.value)}
+              title="Select a project to view"
+            >
+              {store.projects.map((pr) => (
+                <option key={pr.id} value={pr.id}>
+                  {pr.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
         <button className="btn ghost" onClick={() => onEdit(p)}>✏️ Edit Project</button>
       </div>
 

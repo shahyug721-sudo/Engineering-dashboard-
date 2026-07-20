@@ -62,7 +62,7 @@ export default function App() {
               onEdit={(p) => setModal({ project: p })}
             />
             <div className="bottom-grid">
-              <ProjectDetails project={selected} onEdit={(p) => setModal({ project: p })} />
+              <ProjectDetails project={selected} onEdit={(p) => setModal({ project: p })} onSelect={setSelectedId} />
               <RightPanel projects={store.projects} />
             </div>
           </>

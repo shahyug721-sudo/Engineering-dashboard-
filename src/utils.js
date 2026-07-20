@@ -66,11 +66,11 @@ export function fmtDateTime(iso) {
   if (!iso) return '—'
   const d = new Date(iso)
   if (isNaN(d)) return '—'
-  return (
-    d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) +
-    ' ' +
-    d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
-  )
+  // Non-breaking spaces keep the date and time (incl. AM/PM) together on one line.
+  const NB = String.fromCharCode(160)
+  const date = d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }).replace(/ /g, NB)
+  const time = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }).replace(/ /g, NB)
+  return date + ' ' + time
 }
 
 export function daysBetween(fromDate, toIso) {

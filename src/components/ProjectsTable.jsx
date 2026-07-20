@@ -82,7 +82,6 @@ export default function ProjectsTable({ selectedId, onSelect, onEdit, showAction
           <thead>
             <tr>
               <th className="col-name">Project</th>
-              <th>Owner</th>
               {STAGES.map((s) => (
                 <th key={s.key} className="col-stage">
                   {s.label}
@@ -107,7 +106,6 @@ export default function ProjectsTable({ selectedId, onSelect, onEdit, showAction
                     <div className="pname">{p.name}</div>
                     {p.subProject && <div className="psub">{p.subProject}</div>}
                   </td>
-                  <td>{p.owner}</td>
                   {STAGES.map((s) => (
                     <td key={s.key} className="col-stage stage-cell">
                       <button
@@ -122,7 +120,7 @@ export default function ProjectsTable({ selectedId, onSelect, onEdit, showAction
                           )
                         }}
                       >
-                        <StatusIcon status={p.stages[s.key]} />
+                        <StatusIcon status={p.stages[s.key]} size={19} />
                       </button>
                       {openCell && openCell.id === p.id && openCell.stage === s.key && (
                         <div className="stage-menu" onClick={(e) => e.stopPropagation()}>
@@ -149,7 +147,7 @@ export default function ProjectsTable({ selectedId, onSelect, onEdit, showAction
                         store.toggleLive(p.id)
                       }}
                     >
-                      <RocketIcon active={p.live} />
+                      <RocketIcon active={p.live} size={19} />
                     </button>
                   </td>
                   <td className="nowrap">{fmtDate(p.targetRelease)}</td>
@@ -185,7 +183,7 @@ export default function ProjectsTable({ selectedId, onSelect, onEdit, showAction
             })}
             {sorted.length === 0 && (
               <tr>
-                <td colSpan={12 + (showActions ? 1 : 0)} className="empty">
+                <td colSpan={11 + (showActions ? 1 : 0)} className="empty">
                   No projects match the current filters.
                 </td>
               </tr>

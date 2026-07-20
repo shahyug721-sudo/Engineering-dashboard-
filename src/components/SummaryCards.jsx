@@ -3,6 +3,7 @@ import { deriveStatus } from '../utils.js'
 const CARDS = [
   { label: 'Total Projects', sub: 'All Projects', icon: '📚', cls: 'blue', calc: (ps) => ps.length },
   { label: 'Live Projects', sub: 'Live & Completed', icon: '🚀', cls: 'green', calc: (ps) => ps.filter((p) => p.live).length },
+  { label: 'Not Started', sub: 'Yet to Begin', icon: '🕓', cls: 'grey', calc: (ps) => ps.filter((p) => deriveStatus(p) === 'Not Started').length },
   { label: 'In Development', sub: 'In Progress', icon: '💻', cls: 'yellow', calc: (ps) => ps.filter((p) => ['In Development', 'Planning'].includes(deriveStatus(p))).length },
   { label: 'In QA / Testing', sub: 'QA / Testing', icon: '🧪', cls: 'purple', calc: (ps) => ps.filter((p) => deriveStatus(p) === 'In QA / Testing').length },
   { label: 'In UAT', sub: 'User Acceptance', icon: '🧑‍💻', cls: 'teal', calc: (ps) => ps.filter((p) => deriveStatus(p) === 'In UAT').length },
