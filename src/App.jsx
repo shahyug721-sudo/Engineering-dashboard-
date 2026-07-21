@@ -5,6 +5,7 @@ import SummaryCards from './components/SummaryCards.jsx'
 import ProjectsTable from './components/ProjectsTable.jsx'
 import ProjectDetails from './components/ProjectDetails.jsx'
 import RightPanel from './components/RightPanel.jsx'
+import ProgressList from './components/ProgressList.jsx'
 import ProjectModal from './components/ProjectModal.jsx'
 import BackendSheet from './components/BackendSheet.jsx'
 import Reports from './components/Reports.jsx'
@@ -62,7 +63,10 @@ export default function App() {
               onEdit={(p) => setModal({ project: p })}
             />
             <div className="bottom-grid">
-              <ProjectDetails project={selected} onEdit={(p) => setModal({ project: p })} onSelect={setSelectedId} />
+              <div className="left-col">
+                <ProjectDetails project={selected} onEdit={(p) => setModal({ project: p })} onSelect={setSelectedId} />
+                <ProgressList projects={store.projects} selectedId={selected && selected.id} onSelect={setSelectedId} />
+              </div>
               <RightPanel projects={store.projects} />
             </div>
           </>
