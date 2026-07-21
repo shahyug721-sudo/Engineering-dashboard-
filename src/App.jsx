@@ -7,7 +7,6 @@ import ProjectDetails from './components/ProjectDetails.jsx'
 import RightPanel from './components/RightPanel.jsx'
 import ProgressList from './components/ProgressList.jsx'
 import UpdatesFeed from './components/UpdatesFeed.jsx'
-import UpdatesOverview from './components/UpdatesOverview.jsx'
 import ProjectModal from './components/ProjectModal.jsx'
 import BackendSheet from './components/BackendSheet.jsx'
 import ProjectUpdates from './components/ProjectUpdates.jsx'
@@ -66,11 +65,7 @@ export default function App() {
               onSelect={setSelectedId}
               onEdit={(p) => setModal({ project: p })}
             />
-            <UpdatesOverview
-              projects={store.projects}
-              selectedId={selected && selected.id}
-              onSelect={setSelectedId}
-            />
+            <UpdatesFeed selectedId={selected && selected.id} onSelect={setSelectedId} />
             <div className="bottom-grid">
               <div className="left-col">
                 <ProjectDetails project={selected} onEdit={(p) => setModal({ project: p })} onSelect={setSelectedId} />
@@ -78,7 +73,6 @@ export default function App() {
               </div>
               <RightPanel projects={store.projects} />
             </div>
-            <UpdatesFeed selectedId={selected && selected.id} onSelect={setSelectedId} />
           </>
         )}
 
