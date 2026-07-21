@@ -41,14 +41,14 @@ export const SEED_PROJECTS = [
   mk('p15', 'TE2 Backend', 'Ashwinee', 'ATG & GA', '2026-08-31', st(C, C, P, N, N, N, N), false, 'Nirav is working on it', tasks('Update it on AWS and make live')),
   mk('p16', 'Automate EagleRider Tour Creation', 'Ashwinee', 'ATG OLD', '2026-09-15', st(C, C, P, N, N, N, N), false, 'Yug is working on it, phase 1 completed', tasks('Phase 2 to be started')),
   mk('p17', 'Images Copyright', 'Ashwinee', 'All Apps', '2026-07-30', st(C, N, P, N, N, N, N), false, 'Yug is working on images pool to be created with tour folders', tasks('To work on getting the API from Tineye')),
-  mk('p18', 'Stripe Integration - GA RED iOS', 'Ashwinee', 'GA RED Container', '2026-07-30', st(C, C, C, C, C, P, N), false, '', tasks()),
-  mk('p19', 'Stripe Integration - GA Blue iOS', 'Ashwinee', 'GA Blue Container', '2026-07-30', st(C, C, C, C, C, P, N), false, '', tasks()),
-  mk('p20', 'Stripe Integration - GA RED Android', 'Ashwinee', 'GA RED Container', '2026-08-31', st(C, C, P, N, N, N, N), false, '', tasks()),
-  mk('p21', 'Stripe Integration - GA Blue Android', 'Ashwinee', 'GA Blue Container', '2026-08-31', st(C, C, P, N, N, N, N), false, '', tasks()),
+  mk('p18', 'Stripe Integration - GA RED iOS', 'Ashwinee', 'GA RED Container', '2026-07-30', st(C, C, C, C, C, P, N), false, 'Regression testing ongoing', tasks('Submit for UAT')),
+  mk('p19', 'Stripe Integration - GA Blue iOS', 'Ashwinee', 'GA Blue Container', '2026-07-30', st(C, C, C, C, C, P, N), false, 'PR reviews ongoing', tasks('Final Regression')),
+  mk('p20', 'Stripe Integration - GA RED Android', 'Ashwinee', 'GA RED Container', '2026-08-31', st(C, C, P, N, N, N, N), false, 'In Development', tasks('Testing')),
+  mk('p21', 'Stripe Integration - GA Blue Android', 'Ashwinee', 'GA Blue Container', '2026-08-31', st(C, C, P, N, N, N, N), false, 'In Development', tasks('Testing')),
   mk('p22', 'CarPlay – iOS', 'Ashwinee', 'ATG & GA', '2026-09-30', st(P, N, N, N, N, N, N), false, 'Requirements and reseach in progress', tasks('Start the development')),
-  mk('p23', 'Android Auto', 'Ashwinee', 'ATG & GA', '2026-09-30', st(N, N, N, N, N, N, N), false, '', tasks()),
-  mk('p24', 'Graphics Maps - ATG', 'Ashwinee', 'ATG', '2026-09-30', st(C, P, N, N, N, N, N), false, '', tasks()),
-  mk('p25', 'Graphics Maps - GA', 'Ashwinee', 'GA', '2026-09-30', st(C, P, N, N, N, N, N), false, '', tasks()),
+  mk('p23', 'Android Auto', 'Ashwinee', 'ATG & GA', '2026-09-30', st(N, N, N, N, N, N, N), false, 'Not started', tasks('Research and BRD')),
+  mk('p24', 'Graphics Maps - ATG', 'Ashwinee', 'ATG', '2026-09-30', st(C, P, N, N, N, N, N), false, 'Not started', tasks('Start with first template')),
+  mk('p25', 'Graphics Maps - GA', 'Ashwinee', 'GA', '2026-09-30', st(C, P, N, N, N, N, N), false, 'First draft shared by Delhi team', tasks('Approve first draft and share the rest of the tours')),
 ]
 
 export const SEED_OWNERS = ['Ashwinee', 'Piyush']
