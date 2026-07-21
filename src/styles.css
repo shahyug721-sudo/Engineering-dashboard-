@@ -301,16 +301,21 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; paddi
 .status-select.blocked { background: #fde2e2; color: #b91c1c; border-color: #f9c8c8; }
 
 /* ---------- Project Updates page ---------- */
-.upd-intro { margin-bottom: 12px; }
-.updates-table { table-layout: fixed; }
-.updates-table th.upd-project, .updates-table td.upd-project { width: 24%; }
-.updates-table td { vertical-align: top; }
-.upd-project .upd-meta { color: var(--muted); font-size: 11px; margin-top: 4px; }
-.upd-cell textarea { width: 100%; }
-.upd-actions { display: flex; gap: 8px; margin-top: 8px; }
-.upd-actions .btn { padding: 6px 12px; }
-.upd-cell .tasks li { align-items: flex-start; }
-.upd-cell .task-add { margin-top: 8px; }
+.upd-intro { margin-bottom: 10px; font-size: 11.5px; }
+.updates-table { table-layout: fixed; font-size: 12px; }
+.updates-table th { font-size: 11px; }
+.updates-table th.upd-project, .updates-table td.upd-project { width: 22%; }
+.updates-table td { vertical-align: top; padding: 9px 8px; }
+.upd-project .pname { font-size: 12.5px; }
+.upd-project .upd-meta { color: var(--muted); font-size: 10px; margin-top: 3px; line-height: 1.35; }
+.upd-cell textarea { width: 100%; font-size: 12px; padding: 6px 8px; min-height: 48px; }
+.upd-actions { display: flex; gap: 6px; margin-top: 6px; }
+.upd-actions .btn { padding: 4px 11px; font-size: 11.5px; }
+.upd-cell .tasks { font-size: 12px; }
+.upd-cell .tasks li { align-items: flex-start; padding: 3px 0; }
+.upd-cell .task-add { margin-top: 6px; }
+.upd-cell .task-add input { padding: 6px 8px; font-size: 12px; }
+.upd-cell .task-add .btn { padding: 4px 11px; font-size: 11.5px; }
 
 /* ---------- Reports ---------- */
 .report-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 12px; }

@@ -42,7 +42,7 @@ function UpdateRow({ p }) {
 
       <td className="upd-cell">
         <textarea
-          rows={4}
+          rows={3}
           placeholder="Write the current progress…"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
