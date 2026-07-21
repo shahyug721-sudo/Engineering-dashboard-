@@ -1,18 +1,35 @@
-Daily email report — required environment variables
-====================================================
+Engineering Dashboard — environment setup
+==========================================
 Set these in Vercel → your project → Settings → Environment Variables, then Redeploy.
-The cron defined in vercel.json calls /api/report every day at 1:00 PM IST (07:30 UTC).
 
-RESEND_API_KEY   Resend API key. Create a free account at resend.com → API Keys → Create.
-CRON_SECRET      Any long random string. Vercel Cron automatically sends it to the
-                 endpoint as "Authorization: Bearer <CRON_SECRET>". Required — the
-                 endpoint refuses to run without it.
-REPORT_TO        Recipient(s), comma-separated. Default: ashwinee@actiontourguide.com
-REPORT_FROM      Verified sender in Resend, e.g. "Engineering Dashboard <reports@actiontourguide.com>".
-                 For a first test before verifying your domain, use:
-                 Engineering Dashboard <onboarding@resend.dev>
-                 (note: onboarding@resend.dev can only deliver to the Resend account owner's email).
+------------------------------------------------------------------
+1) SHARED DATABASE (so dashboard edits persist and are shared)
+------------------------------------------------------------------
+Easiest path: Vercel → your project → Storage → Create Database → "Upstash for Redis"
+(a.k.a. KV). Connect it to the project and Vercel injects these automatically:
 
-Manual test after setting the variables and redeploying:
+  KV_REST_API_URL      (auto-added by Vercel)
+  KV_REST_API_TOKEN    (auto-added by Vercel)
+
+That's it — no manual copying. The dashboard then reads/writes shared state via
+/api/state, and the daily email reads the same live data.
+(If you use plain Upstash instead, set UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN.)
+
+Without these, the app still works but stores data only in each browser
+(localStorage), and the email falls back to the last deployed data.
+
+------------------------------------------------------------------
+2) DAILY EMAIL (1:00 PM IST via the cron in vercel.json → /api/report)
+------------------------------------------------------------------
+  RESEND_API_KEY   Resend API key. Create a free account at resend.com → API Keys.
+  CRON_SECRET      Any long random string. Vercel Cron sends it as
+                   "Authorization: Bearer <CRON_SECRET>". Required to run.
+  REPORT_TO        Recipient(s), comma-separated. Default: ashwinee@actiontourguide.com
+  REPORT_FROM      Verified sender in Resend, e.g.
+                   "Engineering Dashboard <reports@actiontourguide.com>".
+                   Test value before domain verification (delivers only to the
+                   Resend account owner): Engineering Dashboard <onboarding@resend.dev>
+
+Manual test after setting variables + redeploying:
   https://<your-app>.vercel.app/api/report?key=<CRON_SECRET>
-A 200 with {"ok":true,...} means the email was sent.
+A 200 {"ok":true,...} means the email was sent with the current live data.

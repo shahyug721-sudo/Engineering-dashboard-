@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { SEED } from './data.js'
 import { uid, statusLabel, STAGES } from './utils.js'
 
@@ -19,10 +19,43 @@ function load() {
 }
 
 export function StoreProvider({ children }) {
+  // Render instantly from the local cache, then hydrate from the shared server.
   const [state, setState] = useState(load)
+  const hydrated = useRef(false)
 
+  // One-time hydrate from the shared database (if configured). Falls back to
+  // the local cache when /api/state is unavailable (e.g. local dev, no KV yet).
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/state')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((remote) => {
+        if (!cancelled && remote && Array.isArray(remote.projects)) {
+          setState((s) => ({ ...s, ...remote }))
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        hydrated.current = true
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Persist every change: always to the local cache; debounced to the shared
+  // server once the initial hydrate has completed.
   useEffect(() => {
     localStorage.setItem(KEY, JSON.stringify(state))
+    if (!hydrated.current) return
+    const t = setTimeout(() => {
+      fetch('/api/state', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state),
+      }).catch(() => {})
+    }, 800)
+    return () => clearTimeout(t)
   }, [state])
 
   const now = () => new Date().toISOString()

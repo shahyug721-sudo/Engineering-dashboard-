@@ -1,6 +1,7 @@
-// Builds the daily Engineering report HTML from the deployed project data.
+// Builds the daily Engineering report HTML from the live dashboard data.
 import { SEED } from '../src/data.js'
 import { STAGES, deriveStatus, progress, fmtDate } from '../src/utils.js'
+import { getState, kvConfigured } from './_kv.js'
 
 const esc = (s) =>
   String(s == null ? '' : s)
@@ -151,7 +152,18 @@ export default async function handler(req, res) {
   const subject =
     'Engineering Daily Report — ' +
     now.toLocaleDateString('en-US', { timeZone: 'Asia/Kolkata', month: 'short', day: 'numeric', year: 'numeric' })
-  const html = buildReportHtml(SEED.projects, now)
+
+  // Prefer the live dashboard data saved in KV; fall back to the deployed seed.
+  let projects = SEED.projects
+  if (kvConfigured()) {
+    try {
+      const state = await getState()
+      if (state && Array.isArray(state.projects) && state.projects.length) projects = state.projects
+    } catch {
+      /* KV read failed — fall back to seed */
+    }
+  }
+  const html = buildReportHtml(projects, now)
 
   try {
     const r = await fetch('https://api.resend.com/emails', {
