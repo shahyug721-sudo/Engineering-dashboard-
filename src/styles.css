@@ -309,13 +309,57 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; paddi
 .upd-project .pname { font-size: 12.5px; }
 .upd-project .upd-meta { color: var(--muted); font-size: 10px; margin-top: 3px; line-height: 1.35; }
 .upd-cell textarea { width: 100%; font-size: 12px; padding: 6px 8px; min-height: 48px; }
-.upd-actions { display: flex; gap: 6px; margin-top: 6px; }
-.upd-actions .btn { padding: 4px 11px; font-size: 11.5px; }
+.upd-status { font-size: 10.5px; margin-top: 3px; height: 14px; }
+.upd-status .saving { color: var(--yellow); }
+.upd-status .saved { color: var(--green); font-weight: 600; }
+.upd-status .hint { color: #94a3b8; }
 .upd-cell .tasks { font-size: 12px; }
-.upd-cell .tasks li { align-items: flex-start; padding: 3px 0; }
 .upd-cell .task-add { margin-top: 6px; }
 .upd-cell .task-add input { padding: 6px 8px; font-size: 12px; }
 .upd-cell .task-add .btn { padding: 4px 11px; font-size: 11.5px; }
+.upd-stamp { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+.saved-flash { color: #16a34a; font-weight: 700; }
+/* Next-step item with its own timestamp line */
+.upd-cell .tasks li.upd-task { display: block; padding: 4px 0; }
+.upd-task-row { display: flex; align-items: center; gap: 8px; }
+.upd-task-row label { flex: 1; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.upd-task.done .upd-task-row span { text-decoration: line-through; color: var(--muted); }
+.task-stamp { font-size: 10px; color: var(--muted); }
+.upd-task .task-stamp { display: block; margin-left: 24px; margin-top: 1px; }
+
+/* ---------- Dashboard Updates Feed ---------- */
+.feed-filter { display: flex; align-items: center; gap: 8px; }
+.feed-filter label { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.feed-filter input[type='date'] { font-size: 12px; }
+.feed-scroll { max-height: 380px; overflow-y: auto; }
+.feed-table { width: 100%; table-layout: fixed; font-size: 12px; }
+.feed-table th { position: sticky; top: 0; background: #f8fafd; z-index: 1; font-size: 11px; }
+.feed-table th.feed-project, .feed-table td.feed-project { width: 22%; }
+.feed-table td { vertical-align: top; padding: 9px 8px; }
+.feed-table tbody tr { cursor: pointer; }
+.feed-table tbody tr:hover { background: #f8fafd; }
+.feed-table tbody tr.selected { background: #eef3ff; }
+.feed-project .pname { font-size: 12.5px; }
+.feed-owner { color: var(--muted); font-size: 11px; margin-top: 2px; }
+.feed-text div { line-height: 1.45; }
+.feed-tasks { list-style: none; }
+.feed-tasks li { padding: 2px 0 5px; }
+.feed-tasks li.done span { text-decoration: line-through; color: var(--muted); }
+.feed-tasks .task-stamp { display: block; margin-top: 1px; }
+
+/* ---------- Updates overview (dashboard) ---------- */
+.uo-scroll { max-height: 420px; overflow-y: auto; }
+.uo-table { table-layout: fixed; font-size: 12px; }
+.uo-table th { position: sticky; top: 0; z-index: 1; }
+.uo-table th.uo-name, .uo-table td.uo-name { width: 24%; }
+.uo-table td { vertical-align: top; padding: 8px; }
+.uo-name { font-weight: 600; }
+.uo-dot { display: inline-block; width: 8px; height: 8px; border-radius: 999px; margin-right: 7px; vertical-align: middle; }
+.uo-text p { margin: 1px 0; line-height: 1.4; }
+.uo-steps { list-style: none; }
+.uo-steps li { position: relative; padding-left: 14px; line-height: 1.4; margin: 1px 0; }
+.uo-steps li::before { content: '•'; position: absolute; left: 2px; color: var(--muted); }
+.uo-steps li.done { text-decoration: line-through; color: var(--muted); }
 
 /* ---------- Reports ---------- */
 .report-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 12px; }

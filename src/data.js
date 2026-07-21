@@ -5,9 +5,9 @@ const C = 'completed'
 const P = 'in_progress'
 const N = 'not_started'
 const st = (rg, ui, dev, qa, pr, reg, uat) => ({ rg, ui, dev, qa, pr, regression: reg, uat })
-const tasks = (...items) => items.filter(Boolean).map((text, i) => ({ id: 't' + i, text, done: false }))
-
 const STAMP = '2026-07-20T10:00:00'
+const tasks = (...items) => items.filter(Boolean).map((text, i) => ({ id: 't' + i, text, done: false, at: STAMP }))
+
 const mk = (id, name, owner, product, targetRelease, stages, live, currentUpdate, nextSteps, subProject = '') => ({
   id,
   name,
@@ -18,6 +18,7 @@ const mk = (id, name, owner, product, targetRelease, stages, live, currentUpdate
   live,
   targetRelease,
   currentUpdate,
+  currentUpdateAt: currentUpdate ? STAMP : '',
   nextSteps,
   lastUpdated: STAMP,
   updatedBy: owner,

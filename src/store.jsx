@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { SEED } from './data.js'
 import { uid, statusLabel, STAGES } from './utils.js'
 
-const KEY = 'engineering-dashboard-v4'
+const KEY = 'engineering-dashboard-v5'
 const StoreCtx = createContext(null)
 
 function load() {
@@ -59,8 +59,10 @@ export function StoreProvider({ children }) {
 
     updateProject(id, patch, note) {
       setState((s) => {
+        // Timestamp the current update whenever its text changes.
+        const extra = 'currentUpdate' in patch ? { currentUpdateAt: now() } : {}
         const projects = s.projects.map((p) =>
-          p.id === id ? stamp(s, { ...p, ...patch }) : p
+          p.id === id ? stamp(s, { ...p, ...patch, ...extra }) : p
         )
         const name = (s.projects.find((p) => p.id === id) || {}).name || ''
         return log({ ...register(s, patch), projects }, note || `Updated project "${name}"`)
@@ -109,7 +111,7 @@ export function StoreProvider({ children }) {
       setState((s) => {
         const proj = s.projects.find((p) => p.id === id)
         if (!proj || !text.trim()) return s
-        const task = { id: uid(), text: text.trim(), done: false }
+        const task = { id: uid(), text: text.trim(), done: false, at: now() }
         const projects = s.projects.map((p) =>
           p.id === id ? stamp(s, { ...p, nextSteps: [...p.nextSteps, task] }) : p
         )
