@@ -80,7 +80,7 @@ function StatusColumnChart({ projects }) {
   return (
     <div className="panel">
       <div className="panel-head">
-        <h2>Projects by Status</h2>
+        <h2>Status by Release Month</h2>
         <span className="chart-total">{total} total</span>
       </div>
 
@@ -124,10 +124,66 @@ function StatusColumnChart({ projects }) {
   )
 }
 
+// Donut / pie chart of the overall status breakdown.
+function Donut({ projects }) {
+  const order = ['Live', 'In Development', 'In QA / Testing', 'In UAT', 'Not Started', 'Blocked']
+  const counts = {}
+  for (const p of projects) {
+    const s = norm(deriveStatus(p))
+    counts[s] = (counts[s] || 0) + 1
+  }
+  const entries = order.filter((k) => counts[k]).map((k) => [k, counts[k]])
+  const total = projects.length || 1
+  const R = 42
+  const CIRC = 2 * Math.PI * R
+  let offset = 0
+
+  return (
+    <div className="panel">
+      <div className="panel-head">
+        <h2>Projects by Status</h2>
+      </div>
+      <div className="donut-wrap">
+        <svg viewBox="0 0 120 120" className="donut">
+          {entries.map(([k, n]) => {
+            const frac = n / total
+            const el = (
+              <circle
+                key={k}
+                cx="60" cy="60" r={R}
+                fill="none"
+                stroke={STATUS_COLORS[k]}
+                strokeWidth="16"
+                strokeDasharray={`${frac * CIRC} ${CIRC}`}
+                strokeDashoffset={-offset * CIRC}
+                transform="rotate(-90 60 60)"
+              />
+            )
+            offset += frac
+            return el
+          })}
+          <text x="60" y="57" textAnchor="middle" className="donut-num">{projects.length}</text>
+          <text x="60" y="72" textAnchor="middle" className="donut-sub">Total</text>
+        </svg>
+        <ul className="donut-legend">
+          {entries.map(([k, n]) => (
+            <li key={k}>
+              <span className="dot" style={{ background: STATUS_COLORS[k] }} />
+              {k}
+              <b>{n} ({Math.round((n / total) * 100)}%)</b>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
 export default function RightPanel({ projects }) {
   return (
     <div className="right-col">
       <UpcomingReleases projects={projects} />
+      <Donut projects={projects} />
       <StatusColumnChart projects={projects} />
     </div>
   )
