@@ -1,0 +1,18 @@
+Daily email report — required environment variables
+====================================================
+Set these in Vercel → your project → Settings → Environment Variables, then Redeploy.
+The cron defined in vercel.json calls /api/report every day at 1:00 PM IST (07:30 UTC).
+
+RESEND_API_KEY   Resend API key. Create a free account at resend.com → API Keys → Create.
+CRON_SECRET      Any long random string. Vercel Cron automatically sends it to the
+                 endpoint as "Authorization: Bearer <CRON_SECRET>". Required — the
+                 endpoint refuses to run without it.
+REPORT_TO        Recipient(s), comma-separated. Default: ashwinee@actiontourguide.com
+REPORT_FROM      Verified sender in Resend, e.g. "Engineering Dashboard <reports@actiontourguide.com>".
+                 For a first test before verifying your domain, use:
+                 Engineering Dashboard <onboarding@resend.dev>
+                 (note: onboarding@resend.dev can only deliver to the Resend account owner's email).
+
+Manual test after setting the variables and redeploying:
+  https://<your-app>.vercel.app/api/report?key=<CRON_SECRET>
+A 200 with {"ok":true,...} means the email was sent.
