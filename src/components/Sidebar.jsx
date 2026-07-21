@@ -2,6 +2,7 @@ const ITEMS = [
   ['dashboard', '📊', 'Dashboard'],
   ['projects', '📁', 'Projects'],
   ['backend', '📄', 'Backend Sheet'],
+  ['updates', '📝', 'Project Updates'],
   ['reports', '📈', 'Reports'],
   ['notifications', '🔔', 'Notifications'],
   ['users', '👥', 'Users'],

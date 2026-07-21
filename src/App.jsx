@@ -8,6 +8,7 @@ import RightPanel from './components/RightPanel.jsx'
 import ProgressList from './components/ProgressList.jsx'
 import ProjectModal from './components/ProjectModal.jsx'
 import BackendSheet from './components/BackendSheet.jsx'
+import ProjectUpdates from './components/ProjectUpdates.jsx'
 import Reports from './components/Reports.jsx'
 import { NotificationsView, UsersView, SettingsView } from './components/SimpleViews.jsx'
 
@@ -15,6 +16,7 @@ const TITLES = {
   dashboard: 'Dashboard',
   projects: 'Projects',
   backend: 'Backend Sheet',
+  updates: 'Project Updates',
   reports: 'Reports',
   notifications: 'Notifications',
   users: 'Users',
@@ -87,6 +89,7 @@ export default function App() {
         {view === 'backend' && (
           <BackendSheet onEdit={(p) => setModal({ project: p })} onAdd={() => setModal({ project: null })} />
         )}
+        {view === 'updates' && <ProjectUpdates />}
         {view === 'reports' && <Reports />}
         {view === 'notifications' && <NotificationsView />}
         {view === 'users' && <UsersView />}

@@ -300,6 +300,18 @@ textarea { width: 100%; border: 1px solid var(--line); border-radius: 8px; paddi
 .status-select.not_started { background: #f1f5f9; color: #64748b; }
 .status-select.blocked { background: #fde2e2; color: #b91c1c; border-color: #f9c8c8; }
 
+/* ---------- Project Updates page ---------- */
+.upd-intro { margin-bottom: 12px; }
+.updates-table { table-layout: fixed; }
+.updates-table th.upd-project, .updates-table td.upd-project { width: 24%; }
+.updates-table td { vertical-align: top; }
+.upd-project .upd-meta { color: var(--muted); font-size: 11px; margin-top: 4px; }
+.upd-cell textarea { width: 100%; }
+.upd-actions { display: flex; gap: 8px; margin-top: 8px; }
+.upd-actions .btn { padding: 6px 12px; }
+.upd-cell .tasks li { align-items: flex-start; }
+.upd-cell .task-add { margin-top: 8px; }
+
 /* ---------- Reports ---------- */
 .report-metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 12px; }
 .report-metric { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 12px; text-align: center; }
