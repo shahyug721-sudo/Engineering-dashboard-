@@ -64,6 +64,7 @@ export default function App() {
               selectedId={selected && selected.id}
               onSelect={setSelectedId}
               onEdit={(p) => setModal({ project: p })}
+              scrollable
             />
             <UpdatesFeed selectedId={selected && selected.id} onSelect={setSelectedId} />
             <div className="bottom-grid">

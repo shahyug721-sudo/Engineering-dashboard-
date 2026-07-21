@@ -113,6 +113,9 @@ body {
 
 /* ---------- Table ---------- */
 .table-wrap { overflow-x: auto; }
+/* Vertical inner-scroll for the Projects Progress Overview, with sticky header */
+.table-vscroll { max-height: 560px; overflow-y: auto; }
+.table-vscroll thead th { position: sticky; top: 0; z-index: 3; }
 table { width: 100%; border-collapse: collapse; }
 th {
   text-align: left; font-size: 11.5px; text-transform: none; color: var(--muted); font-weight: 600;

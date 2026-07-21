@@ -5,7 +5,7 @@ import { StatusIcon, RocketIcon } from './StatusIcon.jsx'
 
 const STATUS_FILTERS = ['Live', 'In Development', 'In QA / Testing', 'In UAT', 'Blocked', 'Planning']
 
-export default function ProjectsTable({ selectedId, onSelect, onEdit, showActions }) {
+export default function ProjectsTable({ selectedId, onSelect, onEdit, showActions, scrollable }) {
   const store = useStore()
   const [fOwner, setFOwner] = useState('')
   const [fProduct, setFProduct] = useState('')
@@ -77,7 +77,7 @@ export default function ProjectsTable({ selectedId, onSelect, onEdit, showAction
         </div>
       </div>
 
-      <div className="table-wrap" onClick={() => openCell && setOpenCell(null)}>
+      <div className={'table-wrap' + (scrollable ? ' table-vscroll' : '')} onClick={() => openCell && setOpenCell(null)}>
         <table>
           <thead>
             <tr>
