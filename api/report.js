@@ -141,12 +141,18 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
+  const smtpUser = process.env.SMTP_USER
+  const smtpPass = process.env.SMTP_PASS
   const apiKey = process.env.RESEND_API_KEY
-  if (!apiKey) {
-    return res.status(500).json({ error: 'RESEND_API_KEY is not set in the environment.' })
+  if (!smtpUser && !apiKey) {
+    return res.status(500).json({
+      error: 'No email provider configured. Set SMTP_USER + SMTP_PASS (Gmail), or RESEND_API_KEY.',
+    })
   }
   const to = process.env.REPORT_TO || 'ashwinee@actiontourguide.com'
-  const from = process.env.REPORT_FROM || 'Engineering Dashboard <onboarding@resend.dev>'
+  const from =
+    process.env.REPORT_FROM ||
+    (smtpUser ? `Engineering Dashboard <${smtpUser}>` : 'Engineering Dashboard <onboarding@resend.dev>')
 
   const now = new Date()
   const subject =
@@ -164,16 +170,31 @@ export default async function handler(req, res) {
     }
   }
   const html = buildReportHtml(projects, now)
+  const recipients = to.split(',').map((x) => x.trim()).filter(Boolean)
 
   try {
+    // Primary: SMTP (e.g. Gmail / Google Workspace) via an app password.
+    if (smtpUser && smtpPass) {
+      const nodemailer = (await import('nodemailer')).default
+      const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST || 'smtp.gmail.com',
+        port: Number(process.env.SMTP_PORT || 465),
+        secure: true,
+        auth: { user: smtpUser, pass: smtpPass },
+      })
+      const info = await transporter.sendMail({ from, to: recipients, subject, html })
+      return res.status(200).json({ ok: true, via: 'smtp', id: info.messageId, to })
+    }
+
+    // Alternative: Resend HTTP API.
     const r = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: to.split(',').map((x) => x.trim()), subject, html }),
+      body: JSON.stringify({ from, to: recipients, subject, html }),
     })
     const data = await r.json()
     if (!r.ok) return res.status(502).json({ error: 'Email send failed', detail: data })
-    return res.status(200).json({ ok: true, id: data.id, to })
+    return res.status(200).json({ ok: true, via: 'resend', id: data.id, to })
   } catch (err) {
     return res.status(500).json({ error: 'Request failed', detail: String(err) })
   }
