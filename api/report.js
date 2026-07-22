@@ -39,17 +39,10 @@ export function buildReportHtml(projects, nowIst = new Date()) {
     ['Blocked', count((p) => deriveStatus(p) === 'Blocked'), '#ef4444'],
   ]
 
-  // Today at IST midnight for delayed / upcoming comparisons.
+  // Today at IST midnight for the delayed-projects comparison.
   const today = new Date(nowIst.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }))
   today.setHours(0, 0, 0, 0)
-  const inDays = (iso, n) => {
-    if (!iso) return false
-    const d = new Date(iso + 'T00:00:00')
-    const diff = (d - today) / 86400000
-    return diff >= 0 && diff <= n
-  }
   const delayed = projects.filter((p) => !p.live && p.targetRelease && new Date(p.targetRelease + 'T23:59:59') < today)
-  const next7 = projects.filter((p) => !p.live && inDays(p.targetRelease, 7))
 
   // A single proportional bar (track + coloured fill), email-safe via nested tables.
   const bar = (pct, color, h) =>
@@ -80,42 +73,23 @@ export function buildReportHtml(projects, nowIst = new Date()) {
     })
     .join('')
 
-  // Graph 3 — Status by Release Month (mirrors the column chart).
-  const monthKey = (p) => (p.targetRelease ? p.targetRelease.slice(0, 7) : 'TBD')
-  const monthGroups = {}
-  projects.forEach((p) => {
-    const k = monthKey(p)
-    ;(monthGroups[k] = monthGroups[k] || []).push(p)
-  })
-  const monthKeys = Object.keys(monthGroups).sort((a, b) => (a === 'TBD' ? 1 : b === 'TBD' ? -1 : a.localeCompare(b)))
-  const maxMonth = Math.max(1, ...monthKeys.map((k) => monthGroups[k].length))
-  const monthLabel = (k) =>
-    k === 'TBD' ? 'TBD' : new Date(k + '-01T00:00:00').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
-  const monthChart = monthKeys
-    .map((k) => {
-      const list = monthGroups[k]
-      const mt = list.length
-      const mc = {}
-      list.forEach((p) => {
-        const s = norm(deriveStatus(p))
-        mc[s] = (mc[s] || 0) + 1
-      })
-      const segs = statusOrder
-        .filter((s) => mc[s])
-        .map(
-          (s) =>
-            `<td width="${Math.round((mc[s] / mt) * 100)}%" style="background:${STATUS_BG[s]};height:14px;font-size:0;line-height:0;">&nbsp;</td>`
-        )
-        .join('')
-      return `<tr>
-        <td style="font-size:12px;color:#334155;padding:4px 10px 4px 0;white-space:nowrap;">${monthLabel(k)}</td>
-        <td style="padding:4px 0;">
-          <table role="presentation" width="${Math.round((mt / maxMonth) * 100)}%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border-radius:4px;overflow:hidden;"><tr>${segs}</tr></table>
-        </td>
-        <td style="font-size:12px;color:#64748b;padding:4px 0 4px 10px;white-space:nowrap;text-align:right;">${mt}</td>
+  // Upcoming Releases — every not-live project with a target date, soonest first.
+  const shortStatus = (p) => norm(deriveStatus(p)).replace('In QA / Testing', 'Testing').replace('In ', '')
+  const upcoming = projects
+    .filter((p) => !p.live && p.targetRelease)
+    .sort((a, b) => a.targetRelease.localeCompare(b.targetRelease))
+  const upcomingHtml = upcoming.length
+    ? upcoming
+        .map((p) => {
+          const c = STATUS_BG[norm(deriveStatus(p))] || '#64748b'
+          return `<tr>
+        <td style="padding:6px 8px 6px 0;border-bottom:1px solid #eef2f7;font-weight:600;color:#0f172a;font-size:12.5px;">${esc(p.name)}</td>
+        <td style="padding:6px 8px;border-bottom:1px solid #eef2f7;color:#64748b;font-size:12px;white-space:nowrap;">${esc(fmtDate(p.targetRelease))}</td>
+        <td style="padding:6px 0 6px 8px;border-bottom:1px solid #eef2f7;text-align:right;"><span style="background:${c};color:#fff;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;">${esc(shortStatus(p))}</span></td>
       </tr>`
-    })
-    .join('')
+        })
+        .join('')
+    : '<tr><td style="color:#94a3b8;font-size:13px;">No scheduled releases.</td></tr>'
 
   const legend = statusOrder
     .filter((s) => statusCounts[s])
@@ -191,8 +165,8 @@ export function buildReportHtml(projects, nowIst = new Date()) {
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${statusChart}</table>
           </td>
           <td width="50%" valign="top" style="padding-left:12px;">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Status by Release Month</div>
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${monthChart}</table>
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Upcoming Releases</div>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${upcomingHtml}</table>
           </td>
         </tr>
       </table>
@@ -210,7 +184,6 @@ export function buildReportHtml(projects, nowIst = new Date()) {
       </table>
 
       ${listBlock('🚨 Delayed projects', delayed, (p) => 'target was ' + fmtDate(p.targetRelease))}
-      ${listBlock('📅 Releasing in next 7 days', next7, (p) => fmtDate(p.targetRelease))}
 
       <div style="color:#94a3b8;font-size:11px;margin-top:24px;">
         Automated from the Engineering Dashboard. Reflects the latest deployed data.
