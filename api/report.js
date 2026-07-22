@@ -51,6 +51,80 @@ export function buildReportHtml(projects, nowIst = new Date()) {
   const delayed = projects.filter((p) => !p.live && p.targetRelease && new Date(p.targetRelease + 'T23:59:59') < today)
   const next7 = projects.filter((p) => !p.live && inDays(p.targetRelease, 7))
 
+  // A single proportional bar (track + coloured fill), email-safe via nested tables.
+  const bar = (pct, color, h) =>
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:#eef2f7;border-radius:${h / 2}px;"><tr>` +
+    `<td width="${Math.max(2, pct)}%" style="background:${color};height:${h}px;border-radius:${h / 2}px;font-size:0;line-height:0;">&nbsp;</td>` +
+    `<td style="font-size:0;line-height:0;">&nbsp;</td></tr></table>`
+
+  const norm = (s) => (s === 'Planning' ? 'In Development' : s)
+  const statusOrder = ['Live', 'In Development', 'In QA / Testing', 'In UAT', 'Not Started', 'Blocked']
+  const total = projects.length || 1
+
+  // Graph 2 — Projects by Status (mirrors the donut chart).
+  const statusCounts = {}
+  projects.forEach((p) => {
+    const s = norm(deriveStatus(p))
+    statusCounts[s] = (statusCounts[s] || 0) + 1
+  })
+  const statusChart = statusOrder
+    .filter((s) => statusCounts[s])
+    .map((s) => {
+      const n = statusCounts[s]
+      const pct = Math.round((n / total) * 100)
+      return `<tr>
+        <td style="font-size:12px;color:#334155;padding:4px 10px 4px 0;white-space:nowrap;">${s}</td>
+        <td style="padding:4px 0;width:100%;">${bar(pct, STATUS_BG[s], 12)}</td>
+        <td style="font-size:12px;color:#64748b;padding:4px 0 4px 10px;white-space:nowrap;text-align:right;">${n} (${pct}%)</td>
+      </tr>`
+    })
+    .join('')
+
+  // Graph 3 — Status by Release Month (mirrors the column chart).
+  const monthKey = (p) => (p.targetRelease ? p.targetRelease.slice(0, 7) : 'TBD')
+  const monthGroups = {}
+  projects.forEach((p) => {
+    const k = monthKey(p)
+    ;(monthGroups[k] = monthGroups[k] || []).push(p)
+  })
+  const monthKeys = Object.keys(monthGroups).sort((a, b) => (a === 'TBD' ? 1 : b === 'TBD' ? -1 : a.localeCompare(b)))
+  const maxMonth = Math.max(1, ...monthKeys.map((k) => monthGroups[k].length))
+  const monthLabel = (k) =>
+    k === 'TBD' ? 'TBD' : new Date(k + '-01T00:00:00').toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+  const monthChart = monthKeys
+    .map((k) => {
+      const list = monthGroups[k]
+      const mt = list.length
+      const mc = {}
+      list.forEach((p) => {
+        const s = norm(deriveStatus(p))
+        mc[s] = (mc[s] || 0) + 1
+      })
+      const segs = statusOrder
+        .filter((s) => mc[s])
+        .map(
+          (s) =>
+            `<td width="${Math.round((mc[s] / mt) * 100)}%" style="background:${STATUS_BG[s]};height:14px;font-size:0;line-height:0;">&nbsp;</td>`
+        )
+        .join('')
+      return `<tr>
+        <td style="font-size:12px;color:#334155;padding:4px 10px 4px 0;white-space:nowrap;">${monthLabel(k)}</td>
+        <td style="padding:4px 0;">
+          <table role="presentation" width="${Math.round((mt / maxMonth) * 100)}%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;border-radius:4px;overflow:hidden;"><tr>${segs}</tr></table>
+        </td>
+        <td style="font-size:12px;color:#64748b;padding:4px 0 4px 10px;white-space:nowrap;text-align:right;">${mt}</td>
+      </tr>`
+    })
+    .join('')
+
+  const legend = statusOrder
+    .filter((s) => statusCounts[s])
+    .map(
+      (s) =>
+        `<span style="display:inline-block;margin:0 12px 4px 0;font-size:11px;color:#64748b;"><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${STATUS_BG[s]};vertical-align:middle;margin-right:5px;"></span>${s}</span>`
+    )
+    .join('')
+
   const metricCells = metrics
     .map(
       ([label, val, color]) => `
@@ -81,7 +155,8 @@ export function buildReportHtml(projects, nowIst = new Date()) {
         </td>
         <td style="padding:10px 8px;border-bottom:1px solid #eef2f7;vertical-align:top;white-space:nowrap;">
           <span style="display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;color:#fff;background:${STATUS_BG[status] || '#64748b'};">${esc(status)}</span>
-          <div style="font-size:11px;color:#64748b;margin-top:4px;">${pct}% · ${esc(fmtDate(p.targetRelease))}</div>
+          <div style="font-size:11px;color:#64748b;margin:4px 0 3px;">${pct}% · ${esc(fmtDate(p.targetRelease))}</div>
+          <div style="max-width:120px;">${bar(pct, STATUS_BG[status] || '#2563eb', 6)}</div>
         </td>
         <td style="padding:10px 8px;border-bottom:1px solid #eef2f7;vertical-align:top;font-size:13px;color:#334155;">
           ${p.currentUpdate ? esc(p.currentUpdate).replace(/\n/g, '<br/>') : '<span style="color:#94a3b8;">—</span>'}
@@ -106,8 +181,24 @@ export function buildReportHtml(projects, nowIst = new Date()) {
       <h1 style="font-size:20px;margin:0;">Engineering Daily Report</h1>
       <div style="color:#64748b;font-size:13px;margin:4px 0 16px;">${esc(dateStr)} · 1:00 PM IST</div>
 
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:18px;"><tr>${metricCells}</tr></table>
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;">Summary</div>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;"><tr>${metricCells}</tr></table>
 
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+        <tr>
+          <td width="50%" valign="top" style="padding-right:12px;">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Projects by Status</div>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${statusChart}</table>
+          </td>
+          <td width="50%" valign="top" style="padding-left:12px;">
+            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Status by Release Month</div>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${monthChart}</table>
+          </td>
+        </tr>
+      </table>
+      <div style="margin-bottom:20px;">${legend}</div>
+
+      <div style="font-size:13px;font-weight:700;margin:0 0 8px;">Project Updates &amp; Next Steps</div>
       <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:#fff;border:1px solid #e5e9f2;border-radius:10px;overflow:hidden;">
         <tr style="background:#f8fafd;">
           <th align="left" style="padding:10px 8px;font-size:12px;color:#64748b;">Project</th>
