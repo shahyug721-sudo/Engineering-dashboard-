@@ -80,16 +80,17 @@ export function buildReportHtml(projects, nowIst = new Date()) {
     .sort((a, b) => a.targetRelease.localeCompare(b.targetRelease))
   const upcomingHtml = upcoming.length
     ? upcoming
-        .map((p) => {
+        .map((p, i) => {
           const c = STATUS_BG[norm(deriveStatus(p))] || '#64748b'
+          const bg = i % 2 === 0 ? '#ffffff' : '#f8fafc'
           return `<tr>
-        <td style="padding:6px 8px 6px 0;border-bottom:1px solid #eef2f7;font-weight:600;color:#0f172a;font-size:12.5px;">${esc(p.name)}</td>
-        <td style="padding:6px 8px;border-bottom:1px solid #eef2f7;color:#64748b;font-size:12px;white-space:nowrap;">${esc(fmtDate(p.targetRelease))}</td>
-        <td style="padding:6px 0 6px 8px;border-bottom:1px solid #eef2f7;text-align:right;"><span style="background:${c};color:#fff;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;">${esc(shortStatus(p))}</span></td>
+        <td style="padding:9px 18px;background:${bg};border-bottom:1px solid #eef2f7;font-weight:600;color:#0f172a;font-size:12.5px;">${esc(p.name)}</td>
+        <td style="padding:9px 8px;background:${bg};border-bottom:1px solid #eef2f7;color:#64748b;font-size:12px;white-space:nowrap;">${esc(fmtDate(p.targetRelease))}</td>
+        <td style="padding:9px 18px 9px 8px;background:${bg};border-bottom:1px solid #eef2f7;text-align:right;"><span style="background:${c};color:#fff;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;">${esc(shortStatus(p))}</span></td>
       </tr>`
         })
         .join('')
-    : '<tr><td style="color:#94a3b8;font-size:13px;">No scheduled releases.</td></tr>'
+    : '<tr><td style="padding:12px 18px;color:#94a3b8;font-size:13px;">No scheduled releases.</td></tr>'
 
   const legend = statusOrder
     .filter((s) => statusCounts[s])
@@ -102,12 +103,12 @@ export function buildReportHtml(projects, nowIst = new Date()) {
   const metricCells = metrics
     .map(
       ([label, val, color]) => `
-      <td style="padding:10px 6px;text-align:center;background:#f8fafd;border:1px solid #e5e9f2;border-radius:8px;">
-        <div style="font-size:22px;font-weight:800;color:${color};">${val}</div>
-        <div style="font-size:11px;color:#64748b;">${esc(label)}</div>
+      <td width="14%" style="padding:6px 4px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:${color};line-height:1.1;">${val}</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px;">${esc(label)}</div>
       </td>`
     )
-    .join('<td style="width:6px;"></td>')
+    .join('')
 
   const rows = projects
     .map((p) => {
@@ -141,52 +142,63 @@ export function buildReportHtml(projects, nowIst = new Date()) {
     })
     .join('')
 
-  const listBlock = (title, items, extra) =>
-    `<h3 style="font-size:14px;margin:18px 0 6px;">${title}</h3>` +
-    (items.length
-      ? '<ul style="margin:0;padding-left:18px;color:#334155;">' +
-        items.map((p) => `<li>${esc(p.name)} — ${esc(extra(p))}</li>`).join('') +
-        '</ul>'
-      : '<div style="color:#94a3b8;">None</div>')
+  // Reusable section card + column header.
+  const card = (title, inner, pad = '16px 18px') =>
+    `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:#ffffff;border:1px solid #e5e9f2;border-radius:12px;margin-bottom:16px;">
+      <tr><td style="padding:${pad};">
+        <div style="font-size:15px;font-weight:800;color:#0f172a;margin:0 0 12px;">${title}</div>
+        ${inner}
+      </td></tr>
+    </table>`
+  const th = (t, align = 'left') =>
+    `<th align="${align}" style="padding:0 8px 8px;font-size:10.5px;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;font-weight:700;border-bottom:2px solid #eef2f7;">${t}</th>`
+
+  const summaryInner = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>${metricCells}</tr></table>`
+
+  const statusInner = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0">${statusChart}</table>
+      <div style="margin-top:12px;">${legend}</div>`
+
+  const upcomingInner = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>${th('Project')}${th('Target')}${th('Stage', 'right')}</tr>
+        ${upcomingHtml}
+      </table>`
+
+  // Delayed projects — overdue and not live — as a clear, always-present card.
+  const overdueDays = (p) => Math.round((today - new Date(p.targetRelease + 'T00:00:00')) / 86400000)
+  const delayedInner = delayed.length
+    ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>${th('Project')}${th('Was due')}${th('Status', 'right')}</tr>
+        ${delayed
+          .map(
+            (p) => `<tr>
+          <td style="padding:9px 8px;border-bottom:1px solid #eef2f7;font-weight:600;color:#0f172a;font-size:12.5px;">${esc(p.name)}</td>
+          <td style="padding:9px 8px;border-bottom:1px solid #eef2f7;color:#b91c1c;font-size:12px;white-space:nowrap;">${esc(fmtDate(p.targetRelease))} · ${overdueDays(p)}d late</td>
+          <td style="padding:9px 8px;border-bottom:1px solid #eef2f7;text-align:right;"><span style="background:${STATUS_BG[norm(deriveStatus(p))] || '#64748b'};color:#fff;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;">${esc(shortStatus(p))}</span></td>
+        </tr>`
+          )
+          .join('')}
+      </table>`
+    : `<div style="padding:4px 0;color:#16a34a;font-size:13px;font-weight:600;">✅ No delayed projects — everything is on or ahead of schedule.</div>`
+
+  const updatesInner = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+        <tr>${th('Project')}${th('Status')}${th('Current Update')}${th('Next Steps')}</tr>
+        ${rows}
+      </table>`
 
   return `<!doctype html>
   <html><body style="margin:0;background:#f4f6fb;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
-    <div style="max-width:840px;margin:0 auto;padding:20px;">
-      <h1 style="font-size:20px;margin:0;">Engineering Daily Report</h1>
-      <div style="color:#64748b;font-size:13px;margin:4px 0 16px;">${esc(dateStr)} · 1:00 PM IST</div>
-
-      <div style="font-size:13px;font-weight:700;margin:0 0 8px;">Summary</div>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;"><tr>${metricCells}</tr></table>
-
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
-        <tr>
-          <td width="50%" valign="top" style="padding-right:12px;">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Projects by Status</div>
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${statusChart}</table>
-          </td>
-          <td width="50%" valign="top" style="padding-left:12px;">
-            <div style="font-size:13px;font-weight:700;margin-bottom:6px;">Upcoming Releases</div>
-            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">${upcomingHtml}</table>
-          </td>
-        </tr>
-      </table>
-      <div style="margin-bottom:20px;">${legend}</div>
-
-      <div style="font-size:13px;font-weight:700;margin:0 0 8px;">Project Updates &amp; Next Steps</div>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;background:#fff;border:1px solid #e5e9f2;border-radius:10px;overflow:hidden;">
-        <tr style="background:#f8fafd;">
-          <th align="left" style="padding:10px 8px;font-size:12px;color:#64748b;">Project</th>
-          <th align="left" style="padding:10px 8px;font-size:12px;color:#64748b;">Status</th>
-          <th align="left" style="padding:10px 8px;font-size:12px;color:#64748b;">Current Update</th>
-          <th align="left" style="padding:10px 8px;font-size:12px;color:#64748b;">Next Steps</th>
-        </tr>
-        ${rows}
-      </table>
-
-      ${listBlock('🚨 Delayed projects', delayed, (p) => 'target was ' + fmtDate(p.targetRelease))}
-
-      <div style="color:#94a3b8;font-size:11px;margin-top:24px;">
-        Automated from the Engineering Dashboard. Reflects the latest deployed data.
+    <div style="max-width:720px;margin:0 auto;padding:22px 18px;">
+      <div style="padding:2px 2px 16px;">
+        <div style="font-size:22px;font-weight:800;color:#0f172a;">Engineering Daily Report</div>
+        <div style="color:#64748b;font-size:13px;margin-top:3px;">${esc(dateStr)} · 1:00 PM IST</div>
+      </div>
+      ${card('Summary', summaryInner)}
+      ${card('Projects by Status', statusInner)}
+      ${card('Upcoming Releases', upcomingInner)}
+      ${card('Delayed Projects', delayedInner)}
+      ${card('Project Updates &amp; Next Steps', updatesInner, '14px 14px')}
+      <div style="color:#94a3b8;font-size:11px;margin-top:4px;padding:0 4px;">
+        Automated from the Engineering Dashboard · reflects live data at send time.
       </div>
     </div>
   </body></html>`
