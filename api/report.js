@@ -193,10 +193,10 @@ export function buildReportHtml(projects, nowIst = new Date()) {
         <div style="color:#64748b;font-size:13px;margin-top:3px;">${esc(dateStr)} · 1:00 PM IST</div>
       </div>
       ${card('Summary', summaryInner)}
-      ${card('Projects by Status', statusInner)}
-      ${card('Upcoming Releases', upcomingInner)}
+      ${card('Current Update &amp; Next Steps', updatesInner, '14px 14px')}
       ${card('Delayed Projects', delayedInner)}
-      ${card('Project Updates &amp; Next Steps', updatesInner, '14px 14px')}
+      ${card('Upcoming Releases', upcomingInner)}
+      ${card('Projects by Status', statusInner)}
       <div style="color:#94a3b8;font-size:11px;margin-top:4px;padding:0 4px;">
         Automated from the Engineering Dashboard · reflects live data at send time.
       </div>
@@ -225,7 +225,7 @@ export default async function handler(req, res) {
       error: 'No email provider configured. Set SMTP_USER + SMTP_PASS (Gmail), or RESEND_API_KEY.',
     })
   }
-  const to = process.env.REPORT_TO || 'ashwinee@actiontourguide.com'
+  const to = process.env.REPORT_TO || 'incharge@actiontourguide.com'
   const from =
     process.env.REPORT_FROM ||
     (smtpUser ? `Engineering Dashboard <${smtpUser}>` : 'Engineering Dashboard <onboarding@resend.dev>')
