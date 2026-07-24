@@ -203,9 +203,6 @@ export function buildReportHtml(projects, nowIst = new Date()) {
       ${card('Delayed Projects', delayedInner)}
       ${card('Upcoming Releases', upcomingInner)}
       ${card('Projects by Status', statusInner)}
-      <div style="color:#94a3b8;font-size:11px;margin-top:4px;padding:0 4px;">
-        Automated from the Engineering Dashboard · reflects live data at send time.
-      </div>
     </div>
   </body></html>`
 }
