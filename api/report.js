@@ -225,7 +225,8 @@ export default async function handler(req, res) {
       error: 'No email provider configured. Set SMTP_USER + SMTP_PASS (Gmail), or RESEND_API_KEY.',
     })
   }
-  const to = process.env.REPORT_TO || 'incharge@actiontourguide.com'
+  // Comma-separated list — every address receives the daily report.
+  const to = process.env.REPORT_TO || 'incharge@actiontourguide.com,ashwinee@actiontourguide.com'
   const from =
     process.env.REPORT_FROM ||
     (smtpUser ? `Engineering Dashboard <${smtpUser}>` : 'Engineering Dashboard <onboarding@resend.dev>')
