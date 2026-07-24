@@ -27,6 +27,12 @@ export function buildReportHtml(projects, nowIst = new Date()) {
     day: 'numeric',
     year: 'numeric',
   })
+  // Actual send time, so the header stays correct if the schedule changes.
+  const timeStr = nowIst.toLocaleTimeString('en-US', {
+    timeZone: 'Asia/Kolkata',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
 
   const count = (fn) => projects.filter(fn).length
   const metrics = [
@@ -190,7 +196,7 @@ export function buildReportHtml(projects, nowIst = new Date()) {
     <div style="max-width:720px;margin:0 auto;padding:22px 18px;">
       <div style="padding:2px 2px 16px;">
         <div style="font-size:22px;font-weight:800;color:#0f172a;">Engineering Daily Report</div>
-        <div style="color:#64748b;font-size:13px;margin-top:3px;">${esc(dateStr)} · 1:00 PM IST</div>
+        <div style="color:#64748b;font-size:13px;margin-top:3px;">${esc(dateStr)} · ${esc(timeStr)} IST</div>
       </div>
       ${card('Summary', summaryInner)}
       ${card('Current Update &amp; Next Steps', updatesInner, '14px 14px')}
