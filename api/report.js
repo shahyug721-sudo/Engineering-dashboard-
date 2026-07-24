@@ -220,6 +220,20 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
+  // Don't send before this IST date — lets the daily schedule start on a chosen
+  // day without disabling the scheduler. Override with REPORT_START_DATE.
+  // `?force=1` still sends immediately (handy for a manual test).
+  const startDate = process.env.REPORT_START_DATE || '2026-07-25'
+  const todayIst = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' })
+  const forced = (req.query && (req.query.force === '1' || req.query.force === 'true')) || false
+  if (!forced && todayIst < startDate) {
+    return res.status(200).json({
+      ok: true,
+      skipped: true,
+      reason: `Daily report starts ${startDate}; today is ${todayIst}.`,
+    })
+  }
+
   const smtpUser = process.env.SMTP_USER
   const smtpPass = process.env.SMTP_PASS
   const apiKey = process.env.RESEND_API_KEY
